@@ -12,7 +12,7 @@ pub async fn command_starry_sky() -> Result<(), reqwest::Error> {
 pub fn details_starry_sky() -> Command {
     Command {
         command_type: CommandType::StarrySky,
-        commands: vec!["starrysky".to_string()],
+        commands: vec!["starrysky".to_string(), "valot".to_string()],
         description: "Toggle power to fridge".to_string(),
     }
 }

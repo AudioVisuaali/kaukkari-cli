@@ -1,5 +1,6 @@
-use crate::api::{api_amplifier_state, api_volume_set};
+use crate::api::{api_amplifier_state, api_volume_set, AmplifierVolume};
 use crate::commands::base::{Command, CommandType};
+use crate::commands::volume::format_volume;
 
 pub async fn command_volume_down(command: &str) -> Result<(), reqwest::Error> {
     let amount = match command {
@@ -18,9 +19,17 @@ pub async fn command_volume_down(command: &str) -> Result<(), reqwest::Error> {
         _ => 1.0,
     };
 
-    let res = api_volume_set(&(state.volume.value - (amount * multiplier))).await;
-    println!("Volume decreased ✨");
-    res
+    let new_volume = state.volume.value - (amount * multiplier);
+    let _ = api_volume_set(&new_volume).await;
+
+    let updated_state = api_amplifier_state().await?;
+    let stat = format_volume(AmplifierVolume {
+        value: updated_state.volume.value,
+        max: updated_state.volume.max,
+        min: updated_state.volume.min,
+    });
+    println!("Volume decreased ✨ {}", stat);
+    Ok(())
 }
 
 pub fn details_volume_down() -> Command {

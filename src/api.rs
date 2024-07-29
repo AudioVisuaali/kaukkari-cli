@@ -41,7 +41,18 @@ pub struct AmplifierStatusResponseAmplifier {
     pub volume: AmplifierStatusResponseVolume,
 }
 
-pub async fn api_amplifier_state() -> Result<AmplifierStatusResponseAmplifier, reqwest::Error> {
+pub struct AmplifierState {
+    pub powered: bool,
+    pub volume: AmplifierVolume,
+}
+
+pub struct AmplifierVolume {
+    pub min: f32,
+    pub max: f32,
+    pub value: f32,
+}
+
+pub async fn api_amplifier_state() -> Result<AmplifierState, reqwest::Error> {
     let client: reqwest::Client = reqwest::Client::new();
 
     let state: AmplifierStatusResponseResponse = client
@@ -52,9 +63,9 @@ pub async fn api_amplifier_state() -> Result<AmplifierStatusResponseAmplifier, r
         .json()
         .await?;
 
-    Ok(AmplifierStatusResponseAmplifier {
+    Ok(AmplifierState {
         powered: state.result.data.amplifier.powered,
-        volume: AmplifierStatusResponseVolume {
+        volume: AmplifierVolume {
             min: state.result.data.amplifier.volume.min,
             max: state.result.data.amplifier.volume.max,
             value: state.result.data.amplifier.volume.value,
